@@ -1,0 +1,135 @@
+#+STARTUP: indent contents
+#+OPTIONS: toc:nil num:nil
+* Chapter 2: A Simple Lisp Program
+** 2.1: A Grammar for a Subset of English
+Introduces the idea of /generative syntax/. The grammar being
+discussed initially is:
+#+BEGIN_EXAMPLE
+  Sentence => Noun-Phrase + Verb-Phrase
+  Noun-Phrase => Article + Noun
+  Verb-Phrase => Verb + Noun-Phrase
+  Article => the, a,...
+  Noun => man, ball, woman, table...
+  Verb => hit, took, saw, liked...
+#+END_EXAMPLE
+** 2.2: A Straightforward Solution
+Here's Norvig's first implementation:
+#+NAME: grammar
+#+BEGIN_SRC lisp :results silent
+  (defun sentence ()    (append (noun-phrase) (verb-phrase)))
+  (defun noun-phrase () (append (Article) (Noun)))
+  (defun verb-phrase () (append (Verb) (noun-phrase)))
+  (defun Article ()     (one-of '(the a)))
+  (defun Noun ()        (one-of '(man ball woman table)))
+  (defun Verb ()        (one-of '(hit took saw liked)))
+#+END_SRC
+
+The grammar is constructed like most other representations: terminal
+and non-terminal rules. Here the terminal rules are capitalized (NB:
+CL doesn't care about case, this is only a convention for the reader)
+and non-terminals are all lower case.
+
+#+NAME: utility-functions
+#+BEGIN_SRC lisp :results silent
+  (defun one-of (set)
+    "Pick one element of set, and make a list of it."
+    (list (random-elt set)))
+
+  (defun random-elt (choices)
+    "Choose an element from a list at random."
+    (elt choices (random (length choices))))
+#+END_SRC
+An example session:
+#+BEGIN_SRC lisp
+  CL-USER> (sentence)
+  (THE WOMAN SAW A MAN)
+  CL-USER> (sentence)
+  (A BALL TOOK THE TABLE)
+  CL-USER> (trace sentence noun-phrase verb-phrase Article Noun Verb)
+  (SENTENCE NOUN-PHRASE VERB-PHRASE ARTICLE NOUN VERB)
+  CL-USER> (sentence)
+    0: (SENTENCE)
+      1: (NOUN-PHRASE)
+        2: (ARTICLE)
+        2: ARTICLE returned (A)
+        2: (NOUN)
+        2: NOUN returned (BALL)
+      1: NOUN-PHRASE returned (A BALL)
+      1: (VERB-PHRASE)
+        2: (VERB)
+        2: VERB returned (HIT)
+        2: (ARTICLE)
+        2: ARTICLE returned (THE)
+        2: (NOUN)
+        2: NOUN returned (TABLE)
+      1: VERB-PHRASE returned (HIT THE TABLE)
+    0: SENTENCE returned (A BALL HIT THE TABLE)
+  (A BALL HIT THE TABLE)
+  CL-USER> 
+#+END_SRC
+=(random n)= will return a random integer in the range =[0,n)=.
+Norvig points out that while this is an effective representation, it
+is harder to read than the original. Then he demonstrates extending
+the grammar with an indefinite number of adjectives and prepositional
+phrases:
+#+BEGIN_EXAMPLE
+  Noun-Phrase => Article + Adj* + Noun + PP*
+  Adj* => 0̸, Adj + Adj*
+  PP* => 0̸, PP + PP*
+  PP => Prep + Noun-Phrase
+  Adj => big, little, blue, green, ...
+  Prep => to, in, by, with, ...
+#+END_EXAMPLE
+He provides this implementation (NB: redefines =noun-phrase= from above):
+#+BEGIN_SRC lisp :results silent
+  (defun Adj* ()
+    (if (= (random 2) 0)
+        nil
+        (append (Adj) (Adj*))))
+
+  (defun PP* ()
+    (if (random-elt '(t nil))
+        (append (PP) (PP*))
+        nil))
+
+  (defun noun-phrase () (append (Article) (Adj*) (Noun) (PP*)))
+  (defun PP () (append (Prep) (noun-phrase)))
+  (defun Adj () (one-of '(big little blue green adiabatic)))
+  (defun Prep () (one-of '(to in by with on)))
+#+END_SRC
+And an example execution.
+#+BEGIN_EXAMPLE
+  (THE ADIABATIC BLUE LITTLE BLUE MAN HIT A MAN)
+
+  (THE TABLE ON A TABLE BY A WOMAN BY THE BLUE TABLE TO THE MAN IN A BLUE GREEN
+       BALL ON THE TABLE BY A TABLE IN A WOMAN TO THE LITTLE TABLE ON A BALL IN
+       THE MAN WITH THE WOMAN IN THE MAN WITH THE MAN BY THE TABLE WITH THE
+       LITTLE BALL BY A GREEN BLUE MAN IN THE MAN IN A TABLE TO THE BLUE WOMAN IN
+       A MAN IN A BIG BIG LITTLE MAN IN THE WOMAN ON A GREEN ADIABATIC WOMAN ON
+       THE BIG BIG ADIABATIC MAN BY THE WOMAN TO A ADIABATIC BIG ADIABATIC TABLE
+       IN THE TABLE WITH THE LITTLE TABLE ON THE MAN ON A TABLE WITH THE
+       ADIABATIC MAN ON THE BLUE BIG GREEN LITTLE LITTLE GREEN MAN IN THE MAN IN
+       A LITTLE MAN ON A MAN IN A GREEN TABLE WITH A WOMAN WITH THE WOMAN WITH A
+       GREEN LITTLE GREEN WOMAN ON A MAN BY A BIG BALL BY THE TABLE IN THE TABLE
+       BY A WOMAN TO THE GREEN BIG LITTLE TABLE IN A TABLE TO THE BIG GREEN BIG
+       GREEN ADIABATIC BLUE MAN WITH THE MAN WITH THE ADIABATIC BALL TO A MAN
+       WITH A MAN WITH THE WOMAN IN A WOMAN TO THE TABLE IN A BALL IN THE WOMAN
+       WITH A BIG BIG ADIABATIC BALL IN THE TABLE BY A LITTLE BIG LITTLE BLUE
+       BALL TO A LITTLE MAN WITH THE TABLE WITH THE BALL BY A WOMAN TO A TABLE ON
+       THE TABLE TO A GREEN TABLE WITH A GREEN BIG BIG BALL TO A MAN WITH A BIG
+       ADIABATIC BLUE BALL BY THE TABLE TO THE ADIABATIC WOMAN IN THE BIG WOMAN
+       TOOK A WOMAN)
+#+END_EXAMPLE
+I like that second example.
+
+This demonstrates a way to perform choice (Do we return nothing or
+another adjective/prepositional phrase?) with recursion. He also has
+an example that *won't* work because lisp is eager in execution. So
+something like:
+#+BEGIN_SRC lisp
+  (defun Adj* ()
+    "Warning - incorrect definition of Adjectives."
+    (one-of (list nil (append (Adj) (Adj*)))))
+#+END_SRC
+would be a bad idea (infinite recursion). The call to =Adj*= would
+repeat forever.

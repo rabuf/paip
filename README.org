@@ -1,0 +1,36 @@
+#+STARTUP: indent contents
+#+OPTIONS: toc:nil num:nil
+* What is this? 
+This is my attempt to go through Norvig's [[https://github.com/norvig/paip-lisp][Paradigm's of AI
+Programming]]. We used this text in college but that was over a decade
+ago now.
+
+As I generally try to do, I'll write up my work with org-mode and
+org-babel for a literate walkthrough of the code. Both the code
+provided by Norvig and the code I write in working the exercises.
+* DONE Chapter 1
+Skimming this one, it's primarily a review of Lisp.
+* TODO [[file:02.org][Chapter 2 : A Simple Lisp Program]]
+* TODO Chapter 3
+* TODO Chapter 4
+* TODO Chapter 5
+* TODO Chapter 6
+* TODO Chapter 7
+* TODO Chapter 8
+* TODO Chapter 9
+* TODO Chapter 10
+* TODO Chapter 11
+* TODO Chapter 12
+* TODO Chapter 13
+* TODO Chapter 14
+* TODO Chapter 15
+* TODO Chapter 16
+* TODO Chapter 17
+* TODO Chapter 18
+* TODO Chapter 19
+* TODO Chapter 20
+* TODO Chapter 21
+* TODO Chapter 22
+* TODO Chapter 23
+* TODO Chapter 24
+* TODO Chapter 25
