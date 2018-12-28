@@ -1,0 +1,3 @@
+#+STARTUP: contents indent
+#+OPTIONS: toc:nil num:nil
+* Chapter 3: Overview of Lisp
