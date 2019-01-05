@@ -1,3 +1,5 @@
 #+STARTUP: contents indent
 #+OPTIONS: toc:nil num:nil
 * Chapter 3: Overview of Lisp
+This is probably worth going over if you don't have much lisp
+experience. I read it, but I'm not performing exercises from it.

@@ -11,8 +11,8 @@ provided by Norvig and the code I write in working the exercises.
 * DONE Chapter 1
 Skimming this one, it's primarily a review of Lisp.
 * DONE [[file:02.org][Chapter 2: A Simple Lisp Program]]
-* TODO [[file:03.org][Chapter 3: Overview of Lisp]]
-* TODO Chapter 4
+* DONE [[file:03.org][Chapter 3: Overview of Lisp]]
+* TODO [[file:04.org][Chapter 4: GPS: The General Problem Solver]]
 * TODO Chapter 5
 * TODO Chapter 6
 * TODO Chapter 7
